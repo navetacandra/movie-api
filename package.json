@@ -2,11 +2,11 @@
   "name": "idlix",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/main.js",
   "scripts": {
     "start": "node dist/main.js",
     "build": "tsc",
-    "dev": "ts-node-dev --watch src --respawn main.ts"
+    "dev": "ts-node-dev --watch src --respawn src/main.ts"
   },
   "keywords": [],
   "author": "navetacandra <naveta.cand@gmail.com>",

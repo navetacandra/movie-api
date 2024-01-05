@@ -10,6 +10,7 @@ export type Movie = {
 };
 
 export type MovieDetail = {
+  id: string;
   title: string;
   rating: string | number;
   year: string | number;
@@ -29,14 +30,19 @@ export type MovieDetail = {
 
 export type SearchResponse = {
   code: number;
-  data:
-    | {
-        status: "success" | "error";
-        itemCount: number;
-        items: Movie[];
-      }
-    | {
-        status: "error";
-        message: string;
-      };
+  data: {
+    status: "success" | "error";
+    itemCount?: number;
+    items?: Movie[];
+    message?: string;
+  };
+};
+
+export type DetailResponse = {
+  code: number;
+  data: {
+    status: "success" | "error";
+    detail?: MovieDetail;
+    message?: string;
+  };
 };

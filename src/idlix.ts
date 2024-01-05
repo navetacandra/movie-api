@@ -1,8 +1,9 @@
 import { load } from "cheerio";
-import { SearchResponse } from "./types";
+import { DetailResponse, SearchResponse } from "./types";
 import axios, { AxiosRequestConfig } from "axios";
 import getMovies from "./utils/getMovies";
 import "dotenv/config";
+import { getDetails } from "./utils/getDetails";
 
 export class IDLIX {
   private home: string;
@@ -27,12 +28,12 @@ export class IDLIX {
     if (query.length < 1) {
       return {
         code: 400,
-        data: { status: "error", message: "Query is required." },
+        data: { status: "error", message: "query is required!" },
       };
     }
 
     const targetURL = `${this.home}page/${page}?s=${encodeURIComponent(
-      query
+      query,
     )}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=&quality=`;
 
     try {
@@ -56,13 +57,13 @@ export class IDLIX {
           Array.from({ length: lastPage }).map(async (_, i) => {
             const res = await axios.get(
               `${this.home}page/${page}?s=${encodeURIComponent(
-                query
+                query,
               )}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=&quality=`,
-              this.requestInit
+              this.requestInit,
             );
             const html = res.data;
             return getMovies(html);
-          })
+          }),
         )) ?? [];
 
       const results = Array.from(new Set(_results.flat()));
@@ -79,7 +80,51 @@ export class IDLIX {
       console.log(`[ERROR] ${err?.toString()}`);
       return {
         code: 500,
-        data: { status: "error", message: err?.toString() ?? "" },
+        data: {
+          status: "error",
+          message: err?.toString() ?? "Internal Server Error",
+        },
+      };
+    }
+  }
+
+  async details(id: string): Promise<DetailResponse> {
+    id = id.trim();
+    if (id.length < 1) {
+      return {
+        code: 400,
+        data: { status: "error", message: "id is required." },
+      };
+    }
+
+    try {
+      const fetchRes = await axios.get(this.home + id, this.requestInit);
+      const html = fetchRes.data;
+      const isSeries = id.startsWith("tv/");
+      const details = getDetails(html, isSeries);
+
+      if (details === null) {
+        return {
+          code: 404,
+          data: { status: "error", message: "id not found!" },
+        };
+      }
+
+      return {
+        code: 200,
+        data: {
+          status: "success",
+          detail: details,
+        },
+      };
+    } catch (err) {
+      console.log(`[ERROR] ${err?.toString()}`);
+      return {
+        code: 500,
+        data: {
+          status: "error",
+          message: err?.toString() ?? "Internal Server Error",
+        },
       };
     }
   }

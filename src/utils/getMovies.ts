@@ -5,7 +5,7 @@ import { Movie } from "../types";
 export default function getMovies(html: string): Movie[] {
   const $ = load(html);
   const movies: Movie[] = $(
-    'article[class="item-infinite col-md-20 item has-post-thumbnail"]'
+    'article[class="item-infinite col-md-20 item has-post-thumbnail"]',
   )
     .map((i, el) => {
       const title = $(el).find(".entry-title > a").text() ?? "";
@@ -14,10 +14,13 @@ export default function getMovies(html: string): Movie[] {
       const poster =
         $(el).find(".content-thumbnail.text-center img").attr("src") ?? "";
       const rating = Number(
-        ($(el).find(".gmr-rating-item").text() ?? "").replace(/[^0-9\.]/g, "")
+        ($(el).find(".gmr-rating-item").text() ?? "").replace(/[^0-9\.]/g, ""),
       );
       const duration = Number(
-        ($(el).find(".gmr-duration-item").text() ?? "").replace(/[^0-9\.]/g, "")
+        ($(el).find(".gmr-duration-item").text() ?? "").replace(
+          /[^0-9\.]/g,
+          "",
+        ),
       );
       const genres: string[] = $(el)
         .find('.gmr-movie-on a[rel="category tag"]')
@@ -38,7 +41,7 @@ export default function getMovies(html: string): Movie[] {
 
       if (id.startsWith("tv/")) {
         const totalEps = Number(
-          ($(".gmr-numbeps").text() ?? "").replace(/[^0-9\.]/g, "")
+          ($(".gmr-numbeps").text() ?? "").replace(/[^0-9\.]/g, ""),
         );
 
         if (!isNaN(totalEps)) detail["totalEps"] = totalEps;

@@ -1,5 +1,5 @@
 import { load } from "cheerio";
-import { serialize } from "./serialize";
+import serialize from "./serialize";
 import { Movie } from "../types";
 
 export default function getMovies(html: string): Movie[] {

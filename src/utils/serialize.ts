@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-export function serialize(url: string): string {
+export default function serialize(url: string): string {
   const idlixURL = process.env.IDLIX_URL ?? "";
   // validate url
   if (!url) return "";

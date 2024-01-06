@@ -1,8 +1,8 @@
 import { load } from "cheerio";
-import { serialize } from "./serialize";
+import serialize from "./serialize";
 import { MovieDetail } from "../types";
 
-export function getDetails(html: string, series = false): MovieDetail | null {
+export default function getDetails(html: string, series = false): MovieDetail | null {
   const $ = load(html);
 
   // Invalid / Not Found Movie

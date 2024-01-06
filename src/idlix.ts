@@ -2,10 +2,10 @@ import { load } from "cheerio";
 import { DetailResponse, SearchResponse } from "./types";
 import axios, { AxiosRequestConfig } from "axios";
 import getMovies from "./utils/getMovies";
+import getDetails from "./utils/getDetails";
 import "dotenv/config";
-import { getDetails } from "./utils/getDetails";
 
-export class IDLIX {
+export default class IDLIX {
   private home: string;
   private requestInit: AxiosRequestConfig<any>;
 

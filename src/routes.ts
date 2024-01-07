@@ -25,8 +25,15 @@ router.get(
     validateParams(req, res, next, ["q"]),
   async (req: Request, res: Response) => {
     const query = req.query.q as string;
+    const start = Number(req.query.start ?? []);
+    const max = Number(req.query.max ?? []);
+
     try {
-      const { code, data } = await idlix.search(query);
+      const { code, data } = await idlix.search(
+        query,
+        isNaN(start) ? 1 : start,
+        isNaN(max) ? 20 : max
+      );
       return res.status(code).json(data);
     } catch (err) {
       return res

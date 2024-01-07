@@ -23,7 +23,7 @@ export default class IDLIX {
     };
   }
 
-  async search(query: string, page = 1): Promise<SearchResponse> {
+  async search(query: string, page = 1, maxPage = 20): Promise<SearchResponse> {
     query = query.trim();
     if (query.length < 1) {
       return {
@@ -32,8 +32,8 @@ export default class IDLIX {
       };
     }
 
-    const targetURL = `${this.home}page/${page}?s=${encodeURIComponent(
-      query,
+    const targetURL = `${this.home}page/1?s=${encodeURIComponent(
+      query
     )}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=&quality=`;
 
     try {
@@ -50,28 +50,37 @@ export default class IDLIX {
         .toArray()
         .filter((f) => f)
         .map((num) => Number(num));
+
+      const startPage = page - 1;
       const lastPage = pages.length > 3 ? pages[pages.length - 2] : 1;
+      let totalPage = lastPage - startPage;
+      totalPage = totalPage > maxPage ? maxPage : totalPage;
 
-      const _results =
-        (await Promise.all(
-          Array.from({ length: lastPage }).map(async (_, i) => {
-            const res = await axios.get(
-              `${this.home}page/${page}?s=${encodeURIComponent(
-                query,
-              )}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=&quality=`,
-              this.requestInit,
-            );
-            const html = res.data;
-            return getMovies(html);
-          }),
-        )) ?? [];
+      const responses =
+        lastPage > 1
+          ? await Promise.all(
+              Array.from({ length: totalPage }).map((_, i) =>
+                axios.get(
+                  `${this.home}page/${i + page}?s=${encodeURIComponent(
+                    query
+                  )}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=&quality=`,
+                  this.requestInit
+                )
+              )
+            )
+          : [fetchRes];
 
-      const results = Array.from(new Set(_results.flat()));
+      const results = Array.from(
+        new Set(
+          responses.map((response) => getMovies(response.data as string)).flat()
+        )
+      );
 
       return {
         code: results.length < 1 ? 404 : 200,
         data: {
           status: results.length < 1 ? "error" : "success",
+          hasNext: lastPage > page + totalPage,
           itemCount: results.length,
           items: results,
         },

@@ -32,6 +32,7 @@ export type SearchResponse = {
   code: number;
   data: {
     status: "success" | "error";
+    hasNext?: boolean;
     itemCount?: number;
     items?: Movie[];
     message?: string;

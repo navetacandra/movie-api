@@ -23,6 +23,32 @@ export default class IDLIX {
     };
   }
 
+  async featured(): Promise<SearchResponse> {
+    try {
+      const fetchRes = await axios.get(this.home, this.requestInit);
+      const html = fetchRes.data as string;
+      const results = getMovies(html);
+
+      return {
+        code: results.length < 1 ? 404 : 200,
+        data: {
+          status: results.length < 1 ? "error" : "success",
+          itemCount: results.length,
+          items: results,
+        },
+      };
+    } catch (err) {
+      console.log(`[ERROR] ${err?.toString()}`);
+      return {
+        code: 500,
+        data: {
+          status: "error",
+          message: err?.toString() ?? "Internal Server Error",
+        },
+      };
+    }
+  }
+
   async search(query: string, page = 1, maxPage = 20): Promise<SearchResponse> {
     query = query.trim();
     if (query.length < 1) {

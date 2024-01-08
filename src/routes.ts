@@ -20,6 +20,20 @@ function validateParams(
 }
 
 router.get(
+  "/featured",
+  async (req: Request, res: Response) => {
+    try {
+      const { code, data } = await idlix.featured();
+      return res.status(code).json(data);
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "error", message: err?.toString() ?? "" });
+    }
+  }
+);
+
+router.get(
   "/search",
   (req: Request, res: Response, next: NextFunction) =>
     validateParams(req, res, next, ["q"]),
